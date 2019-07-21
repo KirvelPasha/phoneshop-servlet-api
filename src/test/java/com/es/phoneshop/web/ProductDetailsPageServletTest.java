@@ -8,19 +8,21 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProductListPageServletTest {
+public class ProductDetailsPageServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -29,25 +31,30 @@ public class ProductListPageServletTest {
     private RequestDispatcher requestDispatcher;
     @Mock
     private ProductDao productDao;
-    @Mock
-    private List<Product> productList;
+
+    private Product product = new Product();
+
     @InjectMocks
-    private ProductListPageServlet servlet;
+    private ProductDetailsPageServlet servlet;
 
     @Before
     public void setup() {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(request.getParameter("query")).thenReturn("1");
-        when(request.getParameter("sortBy")).thenReturn("2");
-        when(request.getParameter("order")).thenReturn("3");
-        when(productDao.findProducts("1","2","3")).thenReturn(productList);
+        when(request.getPathInfo()).thenReturn("/1");
     }
 
     @Test
     public void testDoGet() throws ServletException, IOException {
+        when(productDao.getProduct(1L)).thenReturn(Optional.of(product));
         servlet.doGet(request, response);
-        verify(request).setAttribute(eq("products"),eq(productList));
-        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/productList.jsp");
+        verify(request).setAttribute(eq("product"),eq(product));
+        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/product.jsp");
+        verify(requestDispatcher).forward(request, response);
+    }
+    @Test
+    public void testDoGetProductNotFound() throws ServletException, IOException {
+        servlet.doGet(request, response);
+        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/productNotFound.jsp");
         verify(requestDispatcher).forward(request, response);
     }
 }

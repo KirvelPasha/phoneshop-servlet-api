@@ -2,30 +2,33 @@ package com.es.phoneshop.model.product;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.LinkedList;
 import java.util.Objects;
 
 public class Product {
     private Long id;
     private String code;
     private String description;
-    /** null means there is no price because the product is outdated or new */
-    private BigDecimal price;
-    /** can be null if the price is null */
+    /* null means there is no price because the product is outdated or new */
+    /* can be null if the price is null */
     private Currency currency;
     private int stock;
     private String imageUrl;
+    private LinkedList<PriceHistory> priceHistories;
+    private BigDecimal lastPrice;
 
     public Product() {
     }
 
-    public Product(Long id, String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
+    public Product(Long id, String code, String description, Currency currency, int stock, String imageUrl, LinkedList<PriceHistory> priceHistories, BigDecimal lastPrice) {
         this.id = id;
         this.code = code;
         this.description = description;
-        this.price = price;
         this.currency = currency;
         this.stock = stock;
         this.imageUrl = imageUrl;
+        this.priceHistories = priceHistories;
+        this.lastPrice = lastPrice;
     }
 
     public Long getId() {
@@ -52,12 +55,24 @@ public class Product {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public LinkedList<PriceHistory> getPriceHistories() {
+        return priceHistories;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public BigDecimal getPrice() {
+        return priceHistories.getLast().getPrice();
+    }
+
+    public BigDecimal getLastPrice() {
+        return lastPrice;
+    }
+
+    public void setLastPrice(BigDecimal lastPrice) {
+        this.lastPrice = lastPrice;
+    }
+
+    public void setPriceHistories(LinkedList<PriceHistory> priceHistories) {
+        this.priceHistories = priceHistories;
     }
 
     public Currency getCurrency() {
@@ -93,14 +108,13 @@ public class Product {
                 Objects.equals(id, product.id) &&
                 Objects.equals(code, product.code) &&
                 Objects.equals(description, product.description) &&
-                Objects.equals(price, product.price) &&
                 Objects.equals(currency, product.currency) &&
                 Objects.equals(imageUrl, product.imageUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, code, description, price, currency, stock, imageUrl);
+        return Objects.hash(id, code, description, currency, stock, imageUrl);
     }
 
     @Override
@@ -109,7 +123,6 @@ public class Product {
                 "id=" + id +
                 ", code='" + code + '\'' +
                 ", description='" + description + '\'' +
-                ", price=" + price +
                 ", currency=" + currency +
                 ", stock=" + stock +
                 ", imageUrl='" + imageUrl + '\'' +
