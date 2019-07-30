@@ -1,7 +1,5 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.enums.SortBy;
-import com.es.phoneshop.enums.SortingOrder;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 import org.junit.Before;
@@ -16,16 +14,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 
-import static com.es.phoneshop.web.ProductListPageServlet.QUERY;
-import static com.es.phoneshop.web.ProductListPageServlet.SORTBY;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProductListPageServletTest {
+public class ProductDetailsPageServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -35,32 +31,29 @@ public class ProductListPageServletTest {
     @Mock
     private ProductDao productDao;
     @Mock
-    private List<Product> productList;
+    private Product product;
     @InjectMocks
-    private ProductListPageServlet servlet;
+    private ProductDetailsPageServlet servlet;
 
     @Before
     public void setup() {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(request.getParameter(QUERY)).thenReturn("asc");
-        when(request.getParameter(SORTBY)).thenReturn(SortBy.DESCRIPTION.getSortBy());
-        when(productDao.findProducts("1", SortBy.DESCRIPTION, SortingOrder.ASC)).thenReturn(productList);
+        when(request.getPathInfo()).thenReturn("/1");
     }
 
     @Test
     public void testDoGet() throws ServletException, IOException {
-        when(request.getParameter(QUERY)).thenReturn("asc");
+        when(productDao.getProduct(1L)).thenReturn(Optional.of(product));
         servlet.doGet(request, response);
-        verify(request).setAttribute(eq("products"), eq(productList));
-        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/productList.jsp");
+        verify(request).setAttribute(eq("product"), eq(product));
+        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/product.jsp");
         verify(requestDispatcher).forward(request, response);
     }
 
     @Test
-    public void testDoGetWithEmtyQuery() throws ServletException, IOException {
+    public void testDoGetProductNotFound() throws ServletException, IOException {
         servlet.doGet(request, response);
-        verify(request).setAttribute(eq("products"), eq(productList));
-        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/productList.jsp");
+        verify(request, times(1)).getRequestDispatcher("/WEB-INF/pages/productNotFound.jsp");
         verify(requestDispatcher).forward(request, response);
     }
 }
