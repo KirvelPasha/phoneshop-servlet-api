@@ -41,7 +41,7 @@ public class ArrayListProductDaoTest {
         productDao.setProducts(new ArrayList<>(Arrays.asList(product1, product2, product3)));
     }
 
-    public void setupProduct(Product product, Long id, int stock, String description, BigDecimal lastPrice) {
+    private void setupProduct(Product product, Long id, int stock, String description, BigDecimal lastPrice) {
         when(product.getId()).thenReturn(id);
         when(product.getStock()).thenReturn(stock);
         when(product.getDescription()).thenReturn(description);
@@ -99,6 +99,14 @@ public class ArrayListProductDaoTest {
         assertEquals(2, result.size());
         assertSame(product2, result.get(0));
         assertSame(product1, result.get(1));
+    }
+
+    @Test
+    public void testFindProductsWithoutSortBy() {
+        List<Product> result = productDao.findProducts(" ", null, null);
+
+        assertSame(product1, productDao.findProducts().get(0));
+        assertSame(product2, productDao.findProducts().get(1));
     }
 
     @Test
