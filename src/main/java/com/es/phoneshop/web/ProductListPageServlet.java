@@ -4,6 +4,9 @@ import com.es.phoneshop.enums.SortBy;
 import com.es.phoneshop.enums.SortingOrder;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.recentProducts.HttpSessionRecentViewService;
+import com.es.phoneshop.recentProducts.RecentView;
+import com.es.phoneshop.recentProducts.RecentViewService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,23 +19,24 @@ public class ProductListPageServlet extends HttpServlet {
     protected static final String SORTBY = "sortBy";
     protected static final String ORDER = "order";
     private ProductDao productDao;
+    private RecentViewService recentViewService;
 
     @Override
     public void init() throws ServletException {
         productDao = ArrayListProductDao.getInstance();
+        recentViewService = HttpSessionRecentViewService.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String query = request.getParameter(QUERY);
-        SortBy sortBy = request.getParameter(SORTBY) != null ? SortBy.valueOf(request.getParameter(SORTBY)) : null;
-        SortingOrder order = request.getParameter(ORDER) != null ? SortingOrder.valueOf(request.getParameter(ORDER)) : SortingOrder.ASC;
-
-        if (query == null) {
-            request.setAttribute("products", productDao.findProducts(" ", sortBy, order));
-        } else {
-            request.setAttribute("products", productDao.findProducts(query, sortBy, order));
-        }
+        String query = request.getParameter(QUERY) != null ? request.getParameter(QUERY) : " ";
+        SortBy sortBy = request.getParameter(SORTBY) != null ? SortBy.valueOf(request.getParameter(SORTBY).toUpperCase())
+                : null;
+        SortingOrder order = request.getParameter(ORDER) != null ? SortingOrder.valueOf(request.getParameter(ORDER).toUpperCase())
+                : SortingOrder.ASC;
+        RecentView recentView = recentViewService.getRecentView(request);
+        request.setAttribute("recentView", recentView.getRecentlyViewed());
+        request.setAttribute("products", productDao.findProducts(query, sortBy, order));
         request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
     }
 }
