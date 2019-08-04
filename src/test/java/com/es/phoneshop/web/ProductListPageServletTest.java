@@ -52,7 +52,7 @@ public class ProductListPageServletTest {
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
         when(request.getParameter(SORTBY)).thenReturn(SortBy.DESCRIPTION.getSortBy());
         when(request.getParameter(ORDER)).thenReturn(SortingOrder.ASC.getSorting());
-        when(recentViewService.getRecentView(request)).thenReturn(recentView);
+        when(recentViewService.getRecentView(request.getSession())).thenReturn(recentView);
         when(recentView.getRecentlyViewed()).thenReturn(recentlyViewed);
     }
 
@@ -69,7 +69,7 @@ public class ProductListPageServletTest {
     }
 
     @Test
-    public void testDoGetWithEmtyQuery() throws ServletException, IOException {
+    public void testDoGetWithEmptyQuery() throws ServletException, IOException {
         when(productDao.findProducts(" ", SortBy.DESCRIPTION, SortingOrder.ASC)).thenReturn(productList);
         servlet.doGet(request, response);
         verify(request).setAttribute(eq("products"), eq(productList));

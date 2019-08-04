@@ -14,10 +14,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SampleDataListener implements ServletContextListener {
+    private ProductDao productDao = ArrayListProductDao.getInstance();
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        ProductDao productDao = ArrayListProductDao.getInstance();
         getSampleProducts().forEach(productDao::save);
     }
 

@@ -34,7 +34,7 @@ public class ProductListPageServlet extends HttpServlet {
                 : null;
         SortingOrder order = request.getParameter(ORDER) != null ? SortingOrder.valueOf(request.getParameter(ORDER).toUpperCase())
                 : SortingOrder.ASC;
-        RecentView recentView = recentViewService.getRecentView(request);
+        RecentView recentView = recentViewService.getRecentView(request.getSession());
         request.setAttribute("recentView", recentView.getRecentlyViewed());
         request.setAttribute("products", productDao.findProducts(query, sortBy, order));
         request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);

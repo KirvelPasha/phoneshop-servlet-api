@@ -19,7 +19,8 @@ import static com.es.phoneshop.recentProducts.HttpSessionRecentViewService.VIEW_
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpSessionRecentViewServiceTest {
@@ -92,7 +93,7 @@ public class HttpSessionRecentViewServiceTest {
         RecentView existingResult = new RecentView();
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute(VIEW_SESSION_ATTRIBUTE)).thenReturn(existingResult);
-        RecentView result = httpSessionRecentViewService.getRecentView(request);
+        RecentView result = httpSessionRecentViewService.getRecentView(request.getSession());
         assertEquals(existingResult, result);
     }
 
@@ -101,9 +102,8 @@ public class HttpSessionRecentViewServiceTest {
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute(VIEW_SESSION_ATTRIBUTE)).thenReturn(null);
 
-        httpSessionRecentViewService.getRecentView(request);
+        httpSessionRecentViewService.getRecentView(request.getSession());
 
-        verify(request, times(2)).getSession();
         verify(session).setAttribute(eq(VIEW_SESSION_ATTRIBUTE), eq(new RecentView()));
     }
 }

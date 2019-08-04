@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class HttpSessionCartServiceTest {
     private List<CartItem> cartItems;
     @Mock
     private Product product;
-    @Mock
+    @Spy
     private Cart cart;
     @Mock
     private ArrayListProductDao productDao;
@@ -40,8 +41,11 @@ public class HttpSessionCartServiceTest {
     private CartItem cartItem1;
     @Mock
     private CartItem cartItem2;
+    @Spy
+    private Product product1;
     @Mock
-    private BigDecimal totalCost;
+    private Product product2;
+
     @InjectMocks
     private HttpSessionCartService httpSessionCartService;
 
@@ -54,24 +58,28 @@ public class HttpSessionCartServiceTest {
         when(product.getLastPrice()).thenReturn(new BigDecimal(50));
 
 
-        when(cart.getTotalCost()).thenReturn(totalCost);
         when(cart.getCartItems()).thenReturn(cartItems);
 
-        setupCartItem(cartItem1, 2L, 10L);
-        setupCartItem(cartItem2, 3L, 11L);
+        setupCartItem(cartItem1, product1, 10L);
+        setupCartItem(cartItem2, product2, 11L);
+
+        setupProduct(product1, 2L, new BigDecimal(100));
+        setupProduct(product2, 3L, new BigDecimal(120));
+
 
         cartItems = Stream.of(cartItem1, cartItem2).collect(Collectors.toList());
 
         when(cart.getCartItems()).thenReturn(cartItems);
-
-        setupCartItem(cartItem1, 2L, 10L);
-        setupCartItem(cartItem2, 3L, 11L);
-
     }
 
-    private void setupCartItem(CartItem cartItem, Long productId, Long quantity) {
-        when(cartItem.getProductId()).thenReturn(productId);
+    private void setupCartItem(CartItem cartItem, Product product, Long quantity) {
+        when(cartItem.getProduct()).thenReturn(product);
         when(cartItem.getQuantity()).thenReturn(quantity);
+    }
+
+    private void setupProduct(Product product, Long productId, BigDecimal lastPrice) {
+        when(product.getId()).thenReturn(productId);
+        when(product.getLastPrice()).thenReturn(lastPrice);
     }
 
 
@@ -80,19 +88,17 @@ public class HttpSessionCartServiceTest {
         Cart existingCart = new Cart();
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute(CART_SESSION_ATTRIBUTE)).thenReturn(existingCart);
-        Cart cart = httpSessionCartService.getCart(request);
+        Cart cart = httpSessionCartService.getCart(request.getSession());
 
         assertEquals(existingCart, cart);
     }
 
     @Test
     public void getCartTest2() {
-        when(request.getSession()).thenReturn(session);
         when(session.getAttribute(CART_SESSION_ATTRIBUTE)).thenReturn(null);
 
-        httpSessionCartService.getCart(request);
+        httpSessionCartService.getCart(request.getSession());
 
-        verify(request, times(2)).getSession();
         verify(session).setAttribute(eq(CART_SESSION_ATTRIBUTE), eq(new Cart()));
     }
 
@@ -120,5 +126,34 @@ public class HttpSessionCartServiceTest {
         when(productDao.getProduct(2L)).thenReturn(Optional.of(product));
 
         httpSessionCartService.add(cart, 2L, -5L);
+    }
+
+    @Test
+    public void updateTest() throws OutOfStockException {
+        cart.setTotalQuantity(cartItem1.getQuantity() + cartItem2.getQuantity());
+        Long totalQuantityBefore = cart.getTotalQuantity();
+        when(productDao.getProduct(2L)).thenReturn(Optional.of(product1));
+        when(product1.getStock()).thenReturn(20);
+        when(cartItem1.getQuantity()).thenReturn(5L);
+        httpSessionCartService.update(cart, 2L, 5L);
+
+        Long totalQuantityNew = totalQuantityBefore - 5L;
+
+        assertEquals(totalQuantityNew, cart.getTotalQuantity());
+    }
+
+    @Test(expected = OutOfStockException.class)
+    public void testUpdateWithNegativeQuantity() throws OutOfStockException {
+        when(productDao.getProduct(2L)).thenReturn(Optional.of(product1));
+
+        httpSessionCartService.update(cart, 2L, -5L);
+    }
+
+    @Test
+    public void deleteTest() {
+        httpSessionCartService.delete(cart, 2L);
+
+        assertEquals(1, cart.getCartItems().size());
+        assertEquals(cartItem2, cart.getCartItems().get(0));
     }
 }
