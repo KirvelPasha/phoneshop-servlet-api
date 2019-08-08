@@ -14,7 +14,7 @@
         PhoneShop
     </a>
     <a>
-        ${cart}
+        <jsp:include page="/miniCart"/>
     </a>
 </header>
 <main>

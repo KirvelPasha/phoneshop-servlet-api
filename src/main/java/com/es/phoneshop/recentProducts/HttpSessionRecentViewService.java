@@ -4,7 +4,7 @@ import com.es.phoneshop.cart.HttpSessionCartService;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Deque;
 import java.util.Optional;
 
@@ -22,11 +22,11 @@ public class HttpSessionRecentViewService implements RecentViewService {
     }
 
     @Override
-    public RecentView getRecentView(HttpServletRequest request) {
-        RecentView result = (RecentView) request.getSession().getAttribute(VIEW_SESSION_ATTRIBUTE);
+    public RecentView getRecentView(HttpSession session) {
+        RecentView result = (RecentView) session.getAttribute(VIEW_SESSION_ATTRIBUTE);
         if (result == null) {
             result = new RecentView();
-            request.getSession().setAttribute(VIEW_SESSION_ATTRIBUTE, result);
+            session.setAttribute(VIEW_SESSION_ATTRIBUTE, result);
         }
         return result;
     }

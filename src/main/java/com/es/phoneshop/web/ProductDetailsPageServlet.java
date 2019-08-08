@@ -38,9 +38,9 @@ public class ProductDetailsPageServlet extends HttpServlet {
         Optional<Product> optionalProduct = productDao.getProduct(id);
 
         if (optionalProduct.isPresent()) {
-            RecentView recentView = recentViewService.getRecentView(request);
+            RecentView recentView = recentViewService.getRecentView(request.getSession());
             recentViewService.add(recentView, id);
-            request.setAttribute("cart", cartService.getCart(request));
+            request.setAttribute("cart", cartService.getCart(request.getSession()));
             request.setAttribute("product", optionalProduct.get());
             request.setAttribute("recentView", recentView.getRecentlyViewed());
             request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
@@ -52,7 +52,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Cart cart = cartService.getCart(request);
+        Cart cart = cartService.getCart(request.getSession());
         Long productId = parseId(request);
         try {
             Long quantity = Long.valueOf(request.getParameter(QUANTITY));

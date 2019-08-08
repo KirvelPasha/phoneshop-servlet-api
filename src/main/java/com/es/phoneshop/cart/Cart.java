@@ -1,11 +1,12 @@
 package com.es.phoneshop.cart;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Cart {
+public class Cart implements Serializable {
     private List<CartItem> cartItems = new ArrayList<>();
     private BigDecimal totalCost = new BigDecimal(0);
     private Long totalQuantity = 0L;
@@ -38,8 +39,7 @@ public class Cart {
     @Override
     public String toString() {
         return "Cart{" +
-                "cartItems=" + cartItems +
-                ", totalCost=" + totalCost +
+                " totalCost=" + totalCost +
                 ", totalQuantity=" + totalQuantity +
                 '}';
     }
