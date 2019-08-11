@@ -57,6 +57,11 @@
         </form>
     </c:if>
 
+    <form action="${pageContext.request.contextPath}/checkout">
+        <input type="submit" value="Checkout">
+    </form>
+
+
     <c:if test="${ empty cart.cartItems}">
         <span style="color: red">Cart is empty</span>
     </c:if>

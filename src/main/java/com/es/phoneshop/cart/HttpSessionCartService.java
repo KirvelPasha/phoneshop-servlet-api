@@ -70,6 +70,12 @@ public class HttpSessionCartService implements CartService {
         recalculateCart(cart);
     }
 
+    @Override
+    public void clear(Cart cart) {
+        cart.getCartItems().clear();
+        recalculateCart(cart);
+    }
+
 
     private Optional<CartItem> getCurrentCartItemOptional(Cart cart, Long productId) {
         return cart.getCartItems()

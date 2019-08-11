@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import static com.es.phoneshop.cart.HttpSessionCartService.CART_SESSION_ATTRIBUTE;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -155,5 +156,12 @@ public class HttpSessionCartServiceTest {
 
         assertEquals(1, cart.getCartItems().size());
         assertEquals(cartItem2, cart.getCartItems().get(0));
+    }
+
+    @Test
+    public void clear() {
+        httpSessionCartService.clear(cart);
+
+        assertTrue(cart.getCartItems().isEmpty());
     }
 }
