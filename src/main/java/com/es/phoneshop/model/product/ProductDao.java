@@ -19,4 +19,6 @@ public interface ProductDao {
     List<Product> findProducts(String query);
 
     List<Product> findProducts(String query, SortBy sortBy, SortingOrder order);
+
+    List<Product> search(String description ,int minPrice , int maxPrice,int minStock,int maxStock);
 }
