@@ -1,10 +1,13 @@
 package com.es.phoneshop.order;
 
 import com.es.phoneshop.cart.Cart;
+import com.es.phoneshop.cart.CartItem;
+import com.es.phoneshop.cart.HttpSessionCartService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class OrderServiceImpl implements OrderService {
@@ -35,4 +38,11 @@ public class OrderServiceImpl implements OrderService {
         order.setSecureId(UUID.randomUUID().toString());
         OrderDaoImpl.getInstance().save(order);
     }
+
+//    private void recalculateQuantity(List<CartItem> cartItems) {
+//       for (CartItem cartItem : cartItems) {
+//
+//       }
+//
+//    }
 }
