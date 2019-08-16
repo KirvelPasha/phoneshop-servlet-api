@@ -93,6 +93,19 @@ public class ArrayListProductDao implements ProductDao {
         return productList;
     }
 
+    @Override
+    public List<Product> search(String description, int minPrice, int maxPrice, int minStock, int maxStock) {
+        List<Product> productList = findProducts(description);
+       return  productList
+               .stream()
+               .filter(product -> product.getLastPrice().intValue() >= minPrice
+               && product.getLastPrice().intValue() <= maxPrice
+               && product.getStock() >= minStock
+               && product.getStock() <= maxStock)
+               .collect(Collectors.toList());
+    }
+
+
     protected void setProducts(List<Product> productList) {
         this.productList = productList;
     }
